@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#fff8f3">
+    <title>Casa Casino 🎰 - Hausplaner</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            /* Casa Casino Orange Theme */
+            --bg-main: #fff8f3;
+            --bg-card: #ffffff;
+            --bg-elevated: #fef6f0;
+            --bg-hover: #fff0e6;
+            --accent-primary: #ff7b2c;
+            --accent-secondary: #ff9a5c;
+            --accent-light: #fff0e6;
+            --accent-glow: rgba(255, 123, 44, 0.25);
+            
+            /* Status Colors */
+            --status-red: #ef4444;
+            --status-red-bg: rgba(239, 68, 68, 0.1);
+            --status-red-border: rgba(239, 68, 68, 0.3);
+            --status-yellow: #f59e0b;
+            --status-yellow-bg: rgba(245, 158, 11, 0.1);
+            --status-yellow-border: rgba(245, 158, 11, 0.3);
+            --status-green: #10b981;
+            --status-green-bg: rgba(16, 185, 129, 0.1);
+            --status-green-border: rgba(16, 185, 129, 0.3);
+            
+            /* Text */
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            
+            /* Borders */
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --border-active: rgba(255, 123, 44, 0.3);
+            
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        
+        html, body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+        
+        body {
+            padding-bottom: calc(80px + var(--safe-bottom));
+        }
+        
+        /* ============ HEADER ============ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 20px 20px 16px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-radius: 0 0 28px 28px;
+            box-shadow: 0 4px 20px rgba(255, 123, 44, 0.25);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 span {
+            font-size: 1.6rem;
+        }
+        
+        /* ============ MAIN CONTAINER ============ */
+        .main-container {
+            padding: 20px 16px;
+            max-width: 100%;
+        }
+        
+        /* ============ ROOM OVERVIEW ============ */
+        .room-overview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .room-card {
+            position: relative;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 18px 16px;
+            border: 2px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 130px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .room-card:hover, .room-card:active {
+            transform: translateY(-4px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+        
+        .room-icon {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .room-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .room-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+        
+        .progress-fill.status-red { background: linear-gradient(90deg, var(--status-red), #f87171); }
+        .progress-fill.status-yellow { background: linear-gradient(90deg, var(--status-yellow), #fbbf24); }
+        .progress-fill.status-green { background: linear-gradient(90deg, var(--status-green), #34d399); }
+        
+        .progress-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 38px;
+            text-align: right;
+        }
+        
+        .room-status-dots {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.red { background: var(--status-red); }
+        .status-dot.yellow { background: var(--status-yellow); }
+        .status-dot.green { background: var(--status-green); }
+        
+        /* ============ ROOM DETAIL VIEW ============ */
+        .room-detail {
+            display: none;
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .room-detail.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .back-button:hover, .back-button:active {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+            transform: translateX(-4px);
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 2px solid var(--border-subtle);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .detail-icon {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        
+        .detail-info h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .detail-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* ============ STATUS CATEGORIES ============ */
+        .status-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .status-category {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 2px solid var(--border-subtle);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .category-icon {
+            font-size: 1.2rem;
+        }
+        
+        .category-count {
+            background: var(--bg-elevated);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        
+        .category-header.red { 
+            border-left: 5px solid var(--status-red); 
+            background: var(--status-red-bg);
+        }
+        .category-header.yellow { 
+            border-left: 5px solid var(--status-yellow); 
+            background: var(--status-yellow-bg);
+        }
+        .category-header.green { 
+            border-left: 5px solid var(--status-green); 
+            background: var(--status-green-bg);
+        }
+        
+        .category-items {
+            padding: 12px;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .category-empty {
+            text-align: center;
+            padding: 16px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        
+        /* ============ ITEMS ============ */
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-elevated);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s;
+        }
+        
+        .item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .item-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s;
+            min-width: 38px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .item-btn:hover {
+            background: var(--accent-light);
+            border-color: var(--accent-primary);
+        }
+        
+        .item-btn.delete:hover {
+            background: var(--status-red-bg);
+            border-color: var(--status-red);
+        }
+        
+        .item-btn.move {
+            background: var(--bg-card);
+        }
+        
+        .item-btn.move:hover {
+            background: var(--accent-light);
+        }
+        
+        /* ============ ADD ITEM FORM ============ */
+        .add-item-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 2px solid var(--border-subtle);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .add-item-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-primary);
+        }
+        
+        .add-item-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .add-item-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-item-input {
+            flex: 1;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .add-item-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        
+        .add-item-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .add-item-select {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 12px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .add-item-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        
+        .add-item-btn:hover, .add-item-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        
+        /* ============ NOTES SECTION ============ */
+        .notes-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 2px solid var(--border-subtle);
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .notes-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-primary);
+        }
+        
+        .notes-textarea {
+            width: 100%;
+            min-height: 120px;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+        
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        
+        .notes-textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .notes-saved {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--status-green);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .notes-saved.show {
+            opacity: 1;
+        }
+        
+        /* ============ EDIT MODAL ============ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 2px solid var(--border-subtle);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .modal-input {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+        
+        .modal-btn.cancel {
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-subtle);
+        }
+        
+        .modal-btn.save {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            transform: scale(0.98);
+        }
+        
+        /* ============ MOVE MODAL ============ */
+        .move-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .move-option {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+        }
+        
+        .move-option:hover {
+            border-color: var(--accent-primary);
+            background: var(--accent-light);
+        }
+        
+        .move-option.red { border-left: 5px solid var(--status-red); }
+        .move-option.yellow { border-left: 5px solid var(--status-yellow); }
+        .move-option.green { border-left: 5px solid var(--status-green); }
+        
+        /* ============ BOTTOM NAV ============ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-subtle);
+            padding: 8px 16px calc(8px + var(--safe-bottom));
+            z-index: 100;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-muted);
+        }
+        
+        .nav-item:hover {
+            background: var(--accent-light);
+        }
+        
+        .nav-item.active {
+            color: var(--accent-primary);
+        }
+        
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+        
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        
+        /* ============ RESPONSIVE ============ */
+        @media (min-width: 500px) {
+            .room-overview {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 700px) {
+            .room-overview {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <h1><span>🏠</span> Hausplaner Casa Casino</h1>
+        </div>
+    </header>
+    
+    <!-- MAIN CONTENT -->
+    <main class="main-container">
+        <!-- ROOM OVERVIEW -->
+        <div id="roomOverview" class="room-overview">
+            <!-- Rooms will be generated by JS -->
+        </div>
+        
+        <!-- ROOM DETAIL VIEW -->
+        <div id="roomDetail" class="room-detail">
+            <button class="back-button" onclick="showOverview()">
+                <span>←</span>
+                <span>Zurück zur Übersicht</span>
+            </button>
+            
+            <div class="detail-header">
+                <span class="detail-icon" id="detailIcon"></span>
+                <div class="detail-info">
+                    <h2 id="detailTitle"></h2>
+                    <div class="detail-stats">
+                        <span class="stat-item" id="statTotal"></span>
+                        <span class="stat-item" id="statDone"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Item Form -->
+            <div class="add-item-container">
+                <h3 class="add-item-title">➕ Neues Item hinzufügen</h3>
+                <div class="add-item-form">
+                    <input type="text" class="add-item-input" id="newItemInput" placeholder="z.B. Schrank, Garderobe, Lampe...">
+                    <div class="add-item-row">
+                        <select class="add-item-select" id="newItemStatus">
+                            <option value="fehlt">❌ Fehlt</option>
+                            <option value="gehtso">⚠️ Geht so</option>
+                            <option value="fertig">✅ Fertig</option>
+                        </select>
+                        <button class="add-item-btn" onclick="addNewItem()">Hinzufügen</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Categories -->
+            <div class="status-categories" id="statusCategories">
+                <!-- Categories generated by JS -->
+            </div>
+            
+            <!-- Notes -->
+            <div class="notes-container">
+                <h3 class="notes-title">📝 Raum-Notizen</h3>
+                <textarea class="notes-textarea" id="roomNotes" placeholder="Notizen zu diesem Raum... (z.B. Maße, Handwerker-Infos, Ideen)"></textarea>
+                <div class="notes-saved" id="notesSaved">✓ Automatisch gespeichert</div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- EDIT MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h3 class="modal-title">Item bearbeiten</h3>
+            <input type="text" class="modal-input" id="editItemInput" placeholder="Item-Name">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">Abbrechen</button>
+                <button class="modal-btn save" onclick="saveItemEdit()">Speichern</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MOVE MODAL -->
+    <div class="modal-overlay" id="moveModal">
+        <div class="modal">
+            <h3 class="modal-title">Item verschieben nach...</h3>
+            <div class="move-options">
+                <button class="move-option red" onclick="moveItemTo('fehlt')">
+                    <span>❌</span> Fehlt
+                </button>
+                <button class="move-option yellow" onclick="moveItemTo('gehtso')">
+                    <span>⚠️</span> Geht so
+                </button>
+                <button class="move-option green" onclick="moveItemTo('fertig')">
+                    <span>✅</span> Abgeschlossen
+                </button>
+            </div>
+            <button class="modal-btn cancel" onclick="closeMoveModal()" style="width: 100%;">Abbrechen</button>
+        </div>
+    </div>
+    
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a class="nav-item" href="index.html">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Ich</span>
+            </a>
+            <a class="nav-item" href="index.html">
+                <span class="nav-icon">👶</span>
+                <span class="nav-label">Valerie</span>
+            </a>
+            <a class="nav-item active" href="hausplaner.html">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Haus</span>
+            </a>
+            <a class="nav-item" href="index.html">
+                <span class="nav-icon">🍽️</span>
+                <span class="nav-label">Meals</span>
+            </a>
+            <a class="nav-item" href="index.html">
+                <span class="nav-icon">💜</span>
+                <span class="nav-label">Wir</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // ============ DATA STRUCTURE ============
+        // REDUCED ROOM LIST per request
+        const defaultRooms = [
+            { id: 'wohnzimmer', name: 'Wohnzimmer', icon: '🪴' },
+            { id: 'kueche', name: 'Küche', icon: '🥘' },
+            { id: 'schlafzimmer', name: 'Schlafzimmer', icon: '💤' },
+            { id: 'bad', name: 'Badezimmer', icon: '🫧' },
+            { id: 'kinderzimmer', name: 'Kinderzimmer', icon: '🧸' },
+            { id: 'gang', name: 'Gang', icon: '🚪' },
+            { id: 'garten', name: 'Garten', icon: '🌷' },
+            { id: 'keller', name: 'Keller', icon: '🗄️' },
+        ];
+        
+        // Load or initialize data
+        function loadData() {
+            const saved = localStorage.getItem('hausplaner_data_v2');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // Initialize with default structure
+            const data = {
+                rooms: {}
+            };
+            defaultRooms.forEach(room => {
+                data.rooms[room.id] = {
+                    items: {
+                        fehlt: [],
+                        gehtso: [],
+                        fertig: []
+                    },
+                    notes: ''
+                };
+            });
+            return data;
+        }
+        
+        function saveData() {
+            localStorage.setItem('hausplaner_data_v2', JSON.stringify(appData));
+        }
+        
+        let appData = loadData();
+        let currentRoom = null;
+        let editingItemId = null;
+        let movingItem = null;
+        
+        // ============ RENDER ROOM OVERVIEW ============
+        function renderRoomOverview() {
+            const container = document.getElementById('roomOverview');
+            container.innerHTML = '';
+            
+            defaultRooms.forEach((room, index) => {
+                // Ensure room data exists
+                if (!appData.rooms[room.id]) {
+                    appData.rooms[room.id] = {
+                        items: { fehlt: [], gehtso: [], fertig: [] },
+                        notes: ''
+                    };
+                }
+                
+                const roomData = appData.rooms[room.id];
+                const totalItems = roomData.items.fehlt.length + roomData.items.gehtso.length + roomData.items.fertig.length;
+                const doneItems = roomData.items.fertig.length;
+                const progress = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
+                
+                // Determine progress color
+                let progressClass = 'status-red';
+                if (progress >= 70) progressClass = 'status-green';
+                else if (progress >= 30) progressClass = 'status-yellow';
+                
+                const card = document.createElement('div');
+                card.className = 'room-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.onclick = () => showRoomDetail(room.id);
+                
+                card.innerHTML = `
+                    <div>
+                        <span class="room-icon">${room.icon}</span>
+                        <div class="room-name">${room.name}</div>
+                        <div class="room-status-dots">
+                            ${roomData.items.fehlt.length > 0 ? '<span class="status-dot red"></span>' : ''}
+                            ${roomData.items.gehtso.length > 0 ? '<span class="status-dot yellow"></span>' : ''}
+                            ${roomData.items.fertig.length > 0 ? '<span class="status-dot green"></span>' : ''}
+                        </div>
+                    </div>
+                    <div class="room-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill ${progressClass}" style="width: ${progress}%"></div>
+                        </div>
+                        <span class="progress-text">${totalItems > 0 ? progress + '%' : '—'}</span>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // ============ SHOW ROOM DETAIL ============
+        function showRoomDetail(roomId) {
+            currentRoom = roomId;
+            const room = defaultRooms.find(r => r.id === roomId);
+            const roomData = appData.rooms[roomId];
+            
+            document.getElementById('roomOverview').style.display = 'none';
+            const detailView = document.getElementById('roomDetail');
+            detailView.classList.add('active');
+            
+            document.getElementById('detailIcon').textContent = room.icon;
+            document.getElementById('detailTitle').textContent = room.name;
+            
+            const totalItems = roomData.items.fehlt.length + roomData.items.gehtso.length + roomData.items.fertig.length;
+            const doneItems = roomData.items.fertig.length;
+            
+            document.getElementById('statTotal').innerHTML = `📦 ${totalItems} Items`;
+            document.getElementById('statDone').innerHTML = `✅ ${doneItems} fertig`;
+            
+            // Load notes
+            document.getElementById('roomNotes').value = roomData.notes || '';
+            
+            renderStatusCategories();
+        }
+        
+        // ============ RENDER STATUS CATEGORIES ============
+        function renderStatusCategories() {
+            const container = document.getElementById('statusCategories');
+            const roomData = appData.rooms[currentRoom];
+            
+            const categories = [
+                { key: 'fehlt', label: 'Fehlt', icon: '❌', color: 'red' },
+                { key: 'gehtso', label: 'Geht so', icon: '⚠️', color: 'yellow' },
+                { key: 'fertig', label: 'Abgeschlossen', icon: '✅', color: 'green' }
+            ];
+            
+            container.innerHTML = categories.map(cat => `
+                <div class="status-category" data-status="${cat.key}">
+                    <div class="category-header ${cat.color}">
+                        <span class="category-title">
+                            <span class="category-icon">${cat.icon}</span>
+                            ${cat.label}
+                        </span>
+                        <span class="category-count">${roomData.items[cat.key].length}</span>
+                    </div>
+                    <div class="category-items" data-status="${cat.key}">
+                        ${roomData.items[cat.key].length === 0 
+                            ? '<div class="category-empty">Keine Items</div>'
+                            : roomData.items[cat.key].map(item => `
+                                <div class="item" data-id="${item.id}" data-status="${cat.key}">
+                                    <div class="item-content">
+                                        <span class="item-name">${item.name}</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="item-btn move" onclick="openMoveModal('${item.id}', '${cat.key}')" title="Verschieben">↔️</button>
+                                        <button class="item-btn" onclick="editItem('${item.id}', '${cat.key}')" title="Bearbeiten">✏️</button>
+                                        <button class="item-btn delete" onclick="deleteItem('${item.id}', '${cat.key}')" title="Löschen">🗑️</button>
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ============ SHOW OVERVIEW ============
+        function showOverview() {
+            currentRoom = null;
+            document.getElementById('roomDetail').classList.remove('active');
+            document.getElementById('roomOverview').style.display = 'grid';
+            renderRoomOverview();
+        }
+        
+        // ============ ADD NEW ITEM ============
+        function addNewItem() {
+            const input = document.getElementById('newItemInput');
+            const status = document.getElementById('newItemStatus').value;
+            const name = input.value.trim();
+            
+            if (!name) {
+                input.focus();
+                return;
+            }
+            
+            const newItem = {
+                id: 'item_' + Date.now(),
+                name: name
+            };
+            
+            appData.rooms[currentRoom].items[status].push(newItem);
+            saveData();
+            
+            input.value = '';
+            renderStatusCategories();
+            updateDetailStats();
+        }
+        
+        // Enter key support
+        document.getElementById('newItemInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addNewItem();
+        });
+        
+        // ============ EDIT ITEM ============
+        function editItem(itemId, status) {
+            editingItemId = { id: itemId, status: status };
+            const item = appData.rooms[currentRoom].items[status].find(i => i.id === itemId);
+            
+            document.getElementById('editItemInput').value = item.name;
+            document.getElementById('editModal').classList.add('active');
+            document.getElementById('editItemInput').focus();
+        }
+        
+        function saveItemEdit() {
+            const newName = document.getElementById('editItemInput').value.trim();
+            if (!newName) return;
+            
+            const items = appData.rooms[currentRoom].items[editingItemId.status];
+            const item = items.find(i => i.id === editingItemId.id);
+            item.name = newName;
+            
+            saveData();
+            closeModal();
+            renderStatusCategories();
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingItemId = null;
+        }
+        
+        // Close modal on backdrop click
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') closeModal();
+        });
+        
+        // ============ MOVE ITEM (Button-based instead of drag) ============
+        function openMoveModal(itemId, currentStatus) {
+            movingItem = { id: itemId, status: currentStatus };
+            document.getElementById('moveModal').classList.add('active');
+        }
+        
+        function closeMoveModal() {
+            document.getElementById('moveModal').classList.remove('active');
+            movingItem = null;
+        }
+        
+        function moveItemTo(newStatus) {
+            if (!movingItem || movingItem.status === newStatus) {
+                closeMoveModal();
+                return;
+            }
+            
+            // Move item
+            const oldItems = appData.rooms[currentRoom].items[movingItem.status];
+            const itemIndex = oldItems.findIndex(i => i.id === movingItem.id);
+            
+            if (itemIndex > -1) {
+                const [item] = oldItems.splice(itemIndex, 1);
+                appData.rooms[currentRoom].items[newStatus].push(item);
+                saveData();
+                renderStatusCategories();
+                updateDetailStats();
+            }
+            
+            closeMoveModal();
+        }
+        
+        // Close move modal on backdrop click
+        document.getElementById('moveModal').addEventListener('click', (e) => {
+            if (e.target.id === 'moveModal') closeMoveModal();
+        });
+        
+        // ============ DELETE ITEM ============
+        function deleteItem(itemId, status) {
+            const items = appData.rooms[currentRoom].items[status];
+            const index = items.findIndex(i => i.id === itemId);
+            if (index > -1) {
+                items.splice(index, 1);
+                saveData();
+                renderStatusCategories();
+                updateDetailStats();
+            }
+        }
+        
+        // ============ UPDATE STATS ============
+        function updateDetailStats() {
+            const roomData = appData.rooms[currentRoom];
+            const totalItems = roomData.items.fehlt.length + roomData.items.gehtso.length + roomData.items.fertig.length;
+            const doneItems = roomData.items.fertig.length;
+            
+            document.getElementById('statTotal').innerHTML = `📦 ${totalItems} Items`;
+            document.getElementById('statDone').innerHTML = `✅ ${doneItems} fertig`;
+        }
+        
+        // ============ NOTES AUTO-SAVE ============
+        let notesSaveTimeout;
+        document.getElementById('roomNotes').addEventListener('input', (e) => {
+            clearTimeout(notesSaveTimeout);
+            document.getElementById('notesSaved').classList.remove('show');
+            
+            notesSaveTimeout = setTimeout(() => {
+                appData.rooms[currentRoom].notes = e.target.value;
+                saveData();
+                document.getElementById('notesSaved').classList.add('show');
+                
+                setTimeout(() => {
+                    document.getElementById('notesSaved').classList.remove('show');
+                }, 2000);
+            }, 500);
+        });
+        
+        // ============ INITIALIZE ============
+        renderRoomOverview();
+        
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
